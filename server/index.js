@@ -189,4 +189,21 @@ app.get('/get-flashcard-learn', (req, res) => {
     });
 })
 
+app.post('/insert-term', (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).send({ message: 'User not authenticated' });
+    }
+    const { term, definition, definition_vn, example } = req.body;
+    console.log(term, definition, definition_vn, example)
+    const flashcardSetId = req.query.flashcard_set_id;
+
+    const SQL = 'INSERT INTO flashcards(term, definition, flashcard_set_id, definition_vn, example) VALUES (?, ?, ?, ?, ?)';
+    db.query(SQL, [term, definition, flashcardSetId, definition_vn, example], (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        } else {
+            return res.status(201).send({ message: 'Flashcard set added successfully', result });
+        }
+    });
+});
 
