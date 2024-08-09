@@ -94,17 +94,17 @@ const Discovery = () => {
           </div>
         </div>
         <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="modelDetailList" aria-hidden="true">
-          <div className="modal-dialog modal-lg">
-            <div className="modal-content">
-              <div className="modal-header">
+          <div className="modal-dialog modal-lg modal-dialog-centered" style={{ height: '750px' }}>
+            <div className="modal-content" style={{ height: '100%' }}>
+              <div className="modal-header" style={{ position: 'sticky', top: 0, zIndex: 1, backgroundColor: 'white' }}>
                 <h5 className="modal-title" id="modelDetailList">FlashcardSet's Name</h5>
                 <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-              <div className="container-sm" style={{ maxWidth: "744px" }}>
+              <div className="container-sm" style={{ maxWidth: "744px", overflowY: 'auto' }}>
                 <div className="row">
                   {flashcards.map((flashcard) => (
-                    <div key={flashcard.id} className='mt-3'>
-                      <div className="card h-100 d-flex flex-column" style={{ cursor: 'pointer' }}>
+                    <div key={flashcard.id} className='mt-3 mb-3'>
+                      <div className="card h-100 d-flex flex-column mb-3" style={{ cursor: 'pointer' }}>
                         <div className="card-body d-flex flex-column">
                           <h5 className="card-title">{flashcard.term}</h5>
                           {flashcard.definition && <p className="card-text 1">{flashcard.definition}</p>}
@@ -119,6 +119,9 @@ const Discovery = () => {
             </div>
           </div>
         </div>
+
+
+
       </div >
       <ToastContainer />
     </>
