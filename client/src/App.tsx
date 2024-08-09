@@ -7,6 +7,8 @@ import Me from './components/me';
 import Dashboard from './components/dashboard';
 import FlashcardsList from './components/flashcardsList';
 import LearnFlashCard from './components/learnFlashCard';
+import Discovery from './components/discovery';
+import Studying from './components/studying';
 
 const App: React.FC = () => {
   return (
@@ -20,6 +22,9 @@ const App: React.FC = () => {
         <Route path="/flashcards/:setId" element={<FlashcardsList />} />
         <Route path="/flaschcards/learn/:setId" element={<LearnFlashCard/>} />
         <Route path="/flaschcards/addword/:setId" element={<LearnFlashCard/>} />
+        <Route path="/discovery" element={<Discovery />} />
+        <Route path="/studying" element={<Studying />} />
+        <Route path="/me" element={<Me/>} />
       </Routes>
     </Router>
   );

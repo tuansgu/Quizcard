@@ -40,13 +40,13 @@ const Home = () => {
           <div className="collapse navbar-collapse" id="navbarNav">
             <ul className="navbar-nav ms-auto d-flex align-items-center">
               <li className="nav-item">
-                <a className="nav-link" aria-current="page" href="#">List từ của bạn</a>
+                <a className="nav-link" aria-current="page" href="/me">List từ của bạn</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">Đang học</a>
+                <a className="nav-link" href="/studying">Đang học</a>
               </li>
               <li className="nav-item">
-                <a className="nav-link" href="#">Khám phá</a>
+                <a className="nav-link" href="/discovery">Khám phá</a>
               </li>
               <li className="nav-item">
                 <a className="nav-link" aria-current="page" href="/dashboard">Dashboard</a>

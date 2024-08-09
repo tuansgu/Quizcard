@@ -207,3 +207,28 @@ app.post('/insert-term', (req, res) => {
     });
 });
 
+app.post('/share-flashcard-set', (req, res) => {
+    const { id } = req.body;
+    console.log(id);
+    const SQL = 'UPDATE flashcard_sets SET flashcard_sets.status = "1" WHERE flashcard_sets.id = ?';
+    const valueSQL = [id];
+    db.query(SQL, valueSQL, (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        } else {
+            return res.status(201).send({ message: 'Flashcard set shared successfully', result });
+        }
+    })
+})
+
+app.get('/get-flashcard-sets-shared', (req, res) => {
+    const SQL = 'SELECT * FROM flashcard_sets WHERE flashcard_sets.status = 1';
+    db.query(SQL, (err, result) => {
+        if(err) {
+            return res.status(500).send({ error: err.message });
+        } else {
+            console.log(result)
+            return res.status(201).send({ message: 'Loading flashcardsets are shared successfully', result });
+        }
+    })
+})

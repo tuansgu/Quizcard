@@ -1,9 +1,15 @@
 import React from 'react'
+import Home from './home'
 
-const studying = () => {
+const Studying = () => {
   return (
-    <div>studying</div>
+    <>
+      <Home />
+      <div>
+        <h1>Studying</h1>
+      </div>
+    </>
   )
 }
 
-export default studying
+export default Studying
