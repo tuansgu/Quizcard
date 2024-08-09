@@ -9,11 +9,40 @@ interface FlashcardSet {
   name: string;
   description: string;
   user_id: number;
+  username: string;
+}
+
+interface Flashcard {
+  id: number;
+  term: string;
+  definition: string;
+  flashcard_set_id: number;
+  definition_vn: string;
+  example: string;
 }
 
 const Discovery = () => {
   const [flashcardSets, setFlashcardSets] = useState<FlashcardSet[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [flashcards, setFlashcards] = useState<Flashcard[]>([]);
+
+  const handleFlashcardDetail = async (id: number) => {
+    try {
+      const response = await axios.post('http://localhost:3002/get-flashcard-detail', {
+        id: id
+      }, { withCredentials: true });
+
+      if (Array.isArray(response.data.result)) {
+        setFlashcards(response.data.result); // Sử dụng response.data.result thay vì toàn bộ response.data
+        console.log(response.data.result);
+        toast.success('Loading Flashcard Detail Successfully');
+      } else {
+        console.error('Error: Flashcards data is not an array:', response.data.result);
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   useEffect(() => {
     const fetchFlashcardSets = async () => {
@@ -42,25 +71,55 @@ const Discovery = () => {
       <Home />
       <div>
         <h1>Discovery</h1>
-        <div className='col-12 col-md-12'>
-          {error && <div className="alert alert-danger">{error}</div>}
-          <div className='row'>
-            {flashcardSets.map((set) => (
-              <div key={set.id} className='col-12 col-md-6 col-lg-3 mb-2'>
-                <div className='card h-100 d-flex flex-column' style={{ cursor: 'pointer' }}>
-                  <div className='card-body d-flex flex-column'>
-                    <h5 className='card-title'>{set.name}</h5>
-                    <p className='card-text'>{set.description}</p>
-                    <div className="mt-auto d-flex justify-content-center">
-                      <button className="btn btn-primary me-2">Save</button>
+        <div className="container mt-5">
+          <div className='col-12 col-md-12'>
+            {error && <div className="alert alert-danger">{error}</div>}
+            <div className='row'>
+              {flashcardSets.map((set) => (
+                <div key={set.id} className='col-12 col-md-6 col-lg-3' style={{ marginBottom: "20px" }}>
+                  <div className='card h-100 d-flex flex-column' style={{ cursor: 'pointer' }}>
+                    <div className='card-body d-flex flex-column'>
+                      <h5 className='card-title'>{set.name}</h5>
+                      <p className='card-text'>{set.description}</p>
+                      <p className='card-text'>Shared by <strong>{set.username}</strong></p>
+                      <div className="mt-auto d-flex justify-content-center">
+                        <button className="btn btn-primary me-2" onClick={() => handleFlashcardDetail(set.id)} data-bs-toggle="modal" data-bs-target="#exampleModal">Detail</button>
+                        <button className="btn btn-primary me-2">Save</button>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
-      </div>
+        <div className="modal fade" id="exampleModal" tabIndex={-1} aria-labelledby="modelDetailList" aria-hidden="true">
+          <div className="modal-dialog modal-lg">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title" id="modelDetailList">FlashcardSet's Name</h5>
+                <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div className="container-sm" style={{ maxWidth: "744px" }}>
+                <div className="row">
+                  {flashcards.map((flashcard) => (
+                    <div key={flashcard.id} className='mt-3'>
+                      <div className="card h-100 d-flex flex-column" style={{ cursor: 'pointer' }}>
+                        <div className="card-body d-flex flex-column">
+                          <h5 className="card-title">{flashcard.term}</h5>
+                          {flashcard.definition && <p className="card-text 1">{flashcard.definition}</p>}
+                          {flashcard.definition_vn && <p className="card-text 2">{flashcard.definition_vn}</p>}
+                          {flashcard.example && <p className="card-text 3"><strong>Ví dụ:<br /></strong> {flashcard.example}</p>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div >
       <ToastContainer />
     </>
   );

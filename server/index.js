@@ -58,7 +58,7 @@ app.post('/register', async (req, res) => {
             return res.status(400).send({ message: "Email already exists" });
         } else {
             const hashedPwd = await bcrypt.hash(password, 10);
-            const SQL = 'INSERT INTO users(name, password, email) VALUES (?, ?, ?)';
+            const SQL = 'INSERT INTO users(username, password, email) VALUES (?, ?, ?)';
             db.query(SQL, [name, hashedPwd, email], (err) => {
                 if (err) {
                     return res.status(500).send({ error: err.message });
@@ -222,13 +222,27 @@ app.post('/share-flashcard-set', (req, res) => {
 })
 
 app.get('/get-flashcard-sets-shared', (req, res) => {
-    const SQL = 'SELECT * FROM flashcard_sets WHERE flashcard_sets.status = 1';
+    const SQL = 'SELECT * FROM users u JOIN flashcard_sets s ON u.id = s.user_id WHERE s.status = 1';
     db.query(SQL, (err, result) => {
-        if(err) {
+        if (err) {
             return res.status(500).send({ error: err.message });
         } else {
             console.log(result)
             return res.status(201).send({ message: 'Loading flashcardsets are shared successfully', result });
+        }
+    })
+})
+
+app.post('/get-flashcard-detail', (req, res) => {
+    const { id } = req.body; // sử dụng req.body thay vì req.query
+    console.log(id)
+    const SQL = 'SELECT * FROM flashcards WHERE flashcard_set_id = ?';
+    const valueSQL = [id];
+    db.query(SQL, valueSQL, (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        } else {
+            return res.status(200).send({ message: 'Loading flashcard detail successfully', result });
         }
     })
 })
