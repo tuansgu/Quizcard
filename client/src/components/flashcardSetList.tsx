@@ -62,7 +62,7 @@ const FlashcardSetList: React.FC = () => {
                                 {set.description && <p className="card-text">{set.description}</p>}
                                 <div className="mt-auto d-flex justify-content-center">
                                     <button className="btn btn-primary me-2" onClick={() => handleNavigate(set.id)}>Learn Now</button>
-                                    <button className="btn btn-primary me-2" onClick={() => handleShare(set.id)}>Share List</button>
+                                    <button className="btn btn-primary me-2" onClick={() => handleShare(set.id)}>Share It</button>
                                 </div>
                             </div>
                         </div>

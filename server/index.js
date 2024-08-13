@@ -246,3 +246,60 @@ app.post('/get-flashcard-detail', (req, res) => {
         }
     })
 })
+
+app.post('/save-flashcard', (req, res) => {
+    const { id } = req.body;
+    console.log(id);
+
+    const SQL_get_flashcard_set_shared = "SELECT name, description, user_id FROM flashcard_sets WHERE id = ?";
+    const valueSQL_get_flashcard_set_shared = [id];
+
+    db.query(SQL_get_flashcard_set_shared, valueSQL_get_flashcard_set_shared, (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        } else {
+            if (!req.session.user) {
+                return res.status(401).send({ message: 'User not authenticated' });
+            }
+            const user_id = req.session.user.id;
+            const SQL_insert_flashcard_set = "INSERT INTO flashcard_sets (name, description, user_id) VALUES (?, ?, ?)";
+            const valueSQL_insertFlashcardSet = [result[0].name, result[0].description, user_id];
+
+            db.query(SQL_insert_flashcard_set, valueSQL_insertFlashcardSet, (err, result_InsertFlashcardSet) => {
+                if (err) {
+                    return res.status(500).send({ error: err.message });
+                } else {
+                    console.log(result_InsertFlashcardSet);
+
+                    const SQL_insert_flashcards = "INSERT INTO flashcards (term, definition, definition_vn, example, flashcard_set_id) SELECT term, definition, definition_vn, example, ? FROM flashcards WHERE flashcard_set_id = ?";
+                    const valueSQL_insertFlashcards = [result_InsertFlashcardSet.insertId, id];
+
+                    db.query(SQL_insert_flashcards, valueSQL_insertFlashcards, (err, rs) => {
+                        if (err) {
+                            return res.status(500).send({ error: err.message });
+                        } else {
+                            console.log(rs);
+                            return res.status(201).send({ message: 'Saving flashcard successfully', result_InsertFlashcardSet });
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+
+app.post('/logout', (req, res) => {
+    console.log(req.session)
+    if (req.session) {
+        // Destroy the session
+        req.session.destroy(err => {
+            if (err) {
+                return res.status(500).send('Logout failed');
+            } else {
+                return res.send('Logged out successfully');
+            }
+        });
+    } else {
+        res.send('No active session');
+    }
+});

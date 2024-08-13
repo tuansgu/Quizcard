@@ -9,6 +9,7 @@ import FlashcardsList from './components/flashcardsList';
 import LearnFlashCard from './components/learnFlashCard';
 import Discovery from './components/discovery';
 import Studying from './components/studying';
+import Profile from './components/profile';
 
 const App: React.FC = () => {
   return (
@@ -25,6 +26,7 @@ const App: React.FC = () => {
         <Route path="/discovery" element={<Discovery />} />
         <Route path="/studying" element={<Studying />} />
         <Route path="/me" element={<Me/>} />
+        <Route path='/profile' element={<Profile/>} />
       </Routes>
     </Router>
   );

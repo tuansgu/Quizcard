@@ -44,6 +44,21 @@ const Discovery = () => {
     }
   };
 
+  const handleSaveFlashcard = (id: number) => {
+    try {
+      axios.post('http://localhost:3002/save-flashcard', {
+        id: id
+      }, { withCredentials: true })
+        .then(response => {
+          console.log(response.data);
+          toast.success('Saving Flashcard Successfully');
+        })
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
+
   useEffect(() => {
     const fetchFlashcardSets = async () => {
       try {
@@ -84,7 +99,7 @@ const Discovery = () => {
                       <p className='card-text'>Shared by <strong>{set.username}</strong></p>
                       <div className="mt-auto d-flex justify-content-center">
                         <button className="btn btn-primary me-2" onClick={() => handleFlashcardDetail(set.id)} data-bs-toggle="modal" data-bs-target="#exampleModal">Detail</button>
-                        <button className="btn btn-primary me-2">Save</button>
+                        <button className="btn btn-primary me-2" onClick={() => handleSaveFlashcard(set.id)}>Save</button>
                       </div>
                     </div>
                   </div>

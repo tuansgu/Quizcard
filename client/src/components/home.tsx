@@ -29,6 +29,21 @@ const Home = () => {
     fetchUser();
   }, []);
 
+  const handleLogout = () => {
+    axios.post('http://localhost:3002/logout', null, { withCredentials: true })
+    .then(() => {
+        // Perform any additional actions after successful logout
+        console.log('Logged out successfully');
+        // Optionally, redirect the user to the login page
+        window.location.href = '/login';
+    })
+    .catch(error => {
+        // Handle any errors that occur during the logout process
+        console.error('Logout failed:', error);
+    });
+};
+
+
   return (
     <>
       <nav className="navbar navbar-expand-lg navbar-light bg-light">
@@ -56,8 +71,8 @@ const Home = () => {
                   <img src={Icon} alt="User Icon" className="rounded-circle" width="40" height="40" />
                 </a>
                 <ul className="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                  <li><a className="dropdown-item" href="profile">Profile</a></li>
-                  <li><a className="dropdown-item" href="#">Logout</a></li>
+                  <li><a className="dropdown-item" href="/profile" style={{cursor: "pointer"}}>Profile</a></li>
+                  <li><a style={{cursor: 'pointer'}}  className="dropdown-item" onClick={() => handleLogout()}>Logout</a></li>
                 </ul>
               </li>
             </ul>
