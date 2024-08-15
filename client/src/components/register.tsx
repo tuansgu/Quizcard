@@ -4,7 +4,8 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 const Register: React.FC = () => {
-    const [name, setName] = useState('');
+    const [firstname, setFirstname] = useState('');
+    const [lastname, setLastname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -13,11 +14,16 @@ const Register: React.FC = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const today = new Date();
+        const createat = today.toISOString().split('T')[0];
+        console.log("data date register:", createat);
         try {
             const response = await axios.post('http://localhost:3002/register', {
-                name,
+                firstname,
+                lastname,
                 email,
-                password
+                password,
+                createat
             }, { withCredentials: true });
 
             setMessage(response.data.message);
@@ -45,13 +51,24 @@ const Register: React.FC = () => {
             {error && <div className="alert alert-danger">{error}</div>}
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
-                    <label htmlFor="name" className="form-label">Name</label>
+                    <label htmlFor="name" className="form-label">LastName</label>
                     <input
                         type="text"
-                        id="name"
+                        id="lastname"
                         className="form-control"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        value={lastname}
+                        onChange={(e) => setLastname(e.target.value)}
+                        required
+                    />
+                </div>
+                <div className="mb-3">
+                    <label htmlFor="name" className="form-label">FirstName</label>
+                    <input
+                        type="text"
+                        id="firstname"
+                        className="form-control"
+                        value={firstname}
+                        onChange={(e) => setFirstname(e.target.value)}
                         required
                     />
                 </div>

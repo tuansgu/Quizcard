@@ -47,8 +47,8 @@ app.listen(3002, () => {
 });
 
 app.post('/register', async (req, res) => {
-    const { name, password, email } = req.body;
-
+    const { lastname, firstname, password, email, createat } = req.body;
+    console.log(createat)
     const checkEmail = 'SELECT * FROM users WHERE email = ?';
     db.query(checkEmail, [email], async (err, result) => {
         if (err) {
@@ -58,8 +58,8 @@ app.post('/register', async (req, res) => {
             return res.status(400).send({ message: "Email already exists" });
         } else {
             const hashedPwd = await bcrypt.hash(password, 10);
-            const SQL = 'INSERT INTO users(username, password, email) VALUES (?, ?, ?)';
-            db.query(SQL, [name, hashedPwd, email], (err) => {
+            const SQL = 'INSERT INTO users(lastname, firstname, password, email, create_at) VALUES (?, ?, ?, ?, ?)';
+            db.query(SQL, [lastname, firstname, hashedPwd, email, createat], (err) => {
                 if (err) {
                     return res.status(500).send({ error: err.message });
                 } else {
@@ -107,7 +107,6 @@ app.post('/insert-flashcard-set', (req, res) => {
         return res.status(401).send({ message: 'User not authenticated' });
     }
     const { name, description } = req.body;
-    console.log(name, description)
     const user_id = req.session.user.id;
 
     const SQL = 'INSERT INTO flashcard_sets(name, description, user_id) VALUES (?, ?, ?)';
@@ -183,7 +182,6 @@ app.get('/get-flashcard-learn', (req, res) => {
         } else if (result.length === 0) {
             return res.status(404).send({ error: 'Flashcard set not found' });
         } else {
-            console.log(result)
             return res.status(200).send(result);
         }
     });
@@ -194,7 +192,6 @@ app.post('/insert-term', (req, res) => {
         return res.status(401).send({ message: 'User not authenticated' });
     }
     const { term, definition, definition_vn, example } = req.body;
-    console.log(term, definition, definition_vn, example)
     const flashcardSetId = req.query.flashcard_set_id;
 
     const SQL = 'INSERT INTO flashcards(term, definition, flashcard_set_id, definition_vn, example) VALUES (?, ?, ?, ?, ?)';
@@ -209,7 +206,6 @@ app.post('/insert-term', (req, res) => {
 
 app.post('/share-flashcard-set', (req, res) => {
     const { id } = req.body;
-    console.log(id);
     const SQL = 'UPDATE flashcard_sets SET flashcard_sets.status = "1" WHERE flashcard_sets.id = ?';
     const valueSQL = [id];
     db.query(SQL, valueSQL, (err, result) => {
@@ -227,7 +223,6 @@ app.get('/get-flashcard-sets-shared', (req, res) => {
         if (err) {
             return res.status(500).send({ error: err.message });
         } else {
-            console.log(result)
             return res.status(201).send({ message: 'Loading flashcardsets are shared successfully', result });
         }
     })
@@ -235,7 +230,6 @@ app.get('/get-flashcard-sets-shared', (req, res) => {
 
 app.post('/get-flashcard-detail', (req, res) => {
     const { id } = req.body; // sử dụng req.body thay vì req.query
-    console.log(id)
     const SQL = 'SELECT * FROM flashcards WHERE flashcard_set_id = ?';
     const valueSQL = [id];
     db.query(SQL, valueSQL, (err, result) => {
@@ -249,7 +243,6 @@ app.post('/get-flashcard-detail', (req, res) => {
 
 app.post('/save-flashcard', (req, res) => {
     const { id } = req.body;
-    console.log(id);
 
     const SQL_get_flashcard_set_shared = "SELECT name, description, user_id FROM flashcard_sets WHERE id = ?";
     const valueSQL_get_flashcard_set_shared = [id];
@@ -269,8 +262,6 @@ app.post('/save-flashcard', (req, res) => {
                 if (err) {
                     return res.status(500).send({ error: err.message });
                 } else {
-                    console.log(result_InsertFlashcardSet);
-
                     const SQL_insert_flashcards = "INSERT INTO flashcards (term, definition, definition_vn, example, flashcard_set_id) SELECT term, definition, definition_vn, example, ? FROM flashcards WHERE flashcard_set_id = ?";
                     const valueSQL_insertFlashcards = [result_InsertFlashcardSet.insertId, id];
 
@@ -278,7 +269,6 @@ app.post('/save-flashcard', (req, res) => {
                         if (err) {
                             return res.status(500).send({ error: err.message });
                         } else {
-                            console.log(rs);
                             return res.status(201).send({ message: 'Saving flashcard successfully', result_InsertFlashcardSet });
                         }
                     });
@@ -289,7 +279,6 @@ app.post('/save-flashcard', (req, res) => {
 });
 
 app.post('/logout', (req, res) => {
-    console.log(req.session)
     if (req.session) {
         // Destroy the session
         req.session.destroy(err => {
@@ -303,3 +292,38 @@ app.post('/logout', (req, res) => {
         res.send('No active session');
     }
 });
+
+app.post('/update-info', (req, res) => {
+    console.log(req.session.user)
+    if (!req.session.user) {
+        return res.status(401).send({ message: 'User not authenticated' });
+    }
+    const user_id = req.session.user.id;
+    const { lastname, firstname, phone, address, gender, role, update_at } = req.body;
+    const SQL_update_user = "UPDATE users SET lastname = ?, firstname = ?, phone = ?, address = ?, gender = ?, role = ?, update_at = ? WHERE users.id = ?";
+    const valueSQL = [lastname, firstname, phone, address, gender, role, update_at, user_id];
+    db.query(SQL_update_user, valueSQL, (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        } else {
+            return res.status(200).send({ message: 'Update user info successfully' });
+        }
+    });
+})
+
+app.get('/profile', (req, res) => {
+    console.log(req.session.user)
+    if (!req.session.user) {
+        return res.status(401).send({ message: 'User not authenticated' });
+    }
+    const user_id = req.session.user.id;
+    const SQL_get_user = "SELECT * FROM users WHERE users.id = ?";
+    const valueSQL = [user_id];
+    db.query(SQL_get_user, valueSQL, (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        } else {
+            return res.status(200).send(result[0]);
+        }
+    });
+})
