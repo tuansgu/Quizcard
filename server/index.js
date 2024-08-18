@@ -312,7 +312,6 @@ app.post('/update-info', (req, res) => {
 })
 
 app.get('/profile', (req, res) => {
-    console.log(req.session.user)
     if (!req.session.user) {
         return res.status(401).send({ message: 'User not authenticated' });
     }
@@ -327,3 +326,42 @@ app.get('/profile', (req, res) => {
         }
     });
 })
+
+app.put('/updatepassword', (req, res) => {
+    console.log("Profile AccountID: ", req.session.user.id)
+    const user_id = req.session.user.id;
+    console.log(user_id);
+    if (!user_id) {
+        return res.status(401).send({ message: 'User not authenticated' });
+    }
+    const { old_password, new_password } = req.body;
+
+    if (old_password === new_password) {
+        return res.status(400).send({ message: 'New password cannot be the same as the current password' });
+    }
+
+    const SQL_check_password = "SELECT * FROM users WHERE users.id = ?";
+    db.query(SQL_check_password, [user_id], async (err, result) => {
+        if (err) {
+            return res.status(500).send({ error: err.message });
+        } else if (result.length === 0) {
+            return res.status(401).send({ message: 'User not found' });
+        } else {
+            const user = result[0];
+            const isMatch = await bcrypt.compare(old_password, user.password);
+            if (!isMatch) {
+                return res.status(401).send({ message: 'Old password is incorrect' });
+            } else {
+                const hashedNewPassword = await bcrypt.hash(new_password, 10);
+                const SQL_update_password = "UPDATE users SET password = ? WHERE users.id = ?";
+                db.query(SQL_update_password, [hashedNewPassword, user_id], (err) => {
+                    if (err) {
+                        return res.status(500).send({ error: err.message });
+                    } else {
+                        return res.status(200).send({ message: 'Password updated successfully' });
+                    }
+                });
+            }
+        }
+    });
+});
